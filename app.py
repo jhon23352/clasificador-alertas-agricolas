@@ -2,9 +2,28 @@ import streamlit as st
 
 
 # Cargar modelo y vectorizador
-from tensorflow import keras
+import tensorflow as tf
 
-model = keras.models.load_model("keras_model.h5")
+# Cargar modelo TFLite
+interpreter = tf.lite.Interpreter(model_path="model.tflite")
+interpreter.allocate_tensors()
+
+input_details = interpreter.get_input_details()
+output_details = interpreter.get_output_details()
+
+def predict(image):
+    # Preprocesar imagen
+    image = image.resize((224, 224))
+    image = tf.keras.preprocessing.image.img_to_array(image)
+    image = tf.expand_dims(image, axis=0)
+    image = image / 255.0
+
+    # Inferencia
+    interpreter.set_tensor(input_details[0]['index'], image)
+    interpreter.invoke()
+
+    output = interpreter.get_tensor(output_details[0]['index'])
+    return output.argmax()
 
 with open("labels.txt", "r") as file:
     labels = file.readlines()
