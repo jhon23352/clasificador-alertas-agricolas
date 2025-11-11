@@ -1,4 +1,6 @@
-streamlit==1.37.0
-numpy==1.23.5
+streamlit
+tensorflow==2.13.0
+numpy
 pillow
-tflite-runtime==2.7.0
+joblib
+scikit-learn
