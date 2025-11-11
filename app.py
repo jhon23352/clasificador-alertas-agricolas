@@ -1,10 +1,12 @@
 import streamlit as st
-
-
-# Cargar modelo y vectorizador
 import tensorflow as tf
+from PIL import Image
+import joblib
 
-# Cargar modelo TFLite
+# ==========================
+# CARGA DEL MODELO TFLITE
+# ==========================
+
 interpreter = tf.lite.Interpreter(model_path="model.tflite")
 interpreter.allocate_tensors()
 
@@ -23,20 +25,28 @@ def predict(image):
     interpreter.invoke()
 
     output = interpreter.get_tensor(output_details[0]['index'])
-    return output.argmax()
+    return int(output.argmax())
 
+# ==========================
+# CARGA DE LABELS
+# ==========================
 with open("labels.txt", "r") as file:
-    labels = file.readlines()
+    labels = [l.strip() for l in file.readlines()]
 
-vectorizer = joblib.load("vectorizador.pkl")
+# ==========================
+# INTERFAZ STREAMLIT
+# ==========================
 
-st.title("🌱 Clasificador de Alertas Agrícolas")
-st.write("Este prototipo identifica si una alerta pertenece a: helada, sequía, plaga o inundación.")
+st.title("🌱 Clasificador de Alertas Agrícolas por Imagen")
 
-texto = st.text_area("✍️ Ingresar alerta agrícola:")
+uploaded_file = st.file_uploader("📸 Cargar imagen de la alerta", type=["jpg", "jpeg", "png"])
 
-if st.button("Clasificar"):
-    vector = vectorizer.transform([texto])
-    prediction = predict(image)
+if uploaded_file:
+    image = Image.open(uploaded_file)
+    st.image(image, caption="Imagen cargada", use_column_width=True)
 
-    st.success(f"✅ La alerta corresponde a: **{prediccion.upper()}**")
+    if st.button("Clasificar alerta"):
+        pred_idx = predict(image)
+        resultado = labels[pred_idx]
+
+        st.success(f"✅ La alerta detectada es: **{resultado.upper()}**")
