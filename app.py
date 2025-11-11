@@ -1,8 +1,14 @@
 import streamlit as st
-import joblib
+
 
 # Cargar modelo y vectorizador
-model = joblib.load("modelo_alertas.pkl")
+from tensorflow import keras
+
+model = keras.models.load_model("keras_model.h5")
+
+with open("labels.txt", "r") as file:
+    labels = file.readlines()
+
 vectorizer = joblib.load("vectorizador.pkl")
 
 st.title("🌱 Clasificador de Alertas Agrícolas")
