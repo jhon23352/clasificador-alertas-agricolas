@@ -37,5 +37,6 @@ texto = st.text_area("✍️ Ingresar alerta agrícola:")
 
 if st.button("Clasificar"):
     vector = vectorizer.transform([texto])
-    prediccion = model.predict(vector)[0]
+    prediction = predict(image)
+
     st.success(f"✅ La alerta corresponde a: **{prediccion.upper()}**")
